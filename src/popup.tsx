@@ -805,7 +805,12 @@ if (!document.getElementById(ROOT_CONTAINER_ID)) {
                                 color="primary"
                                 size="large"
                                 disabled={!contentIsValid}
-                                onClick={() => {
+                                onClick={async () => {
+                                  for (let i: number = 0; i < 30 && compiledUrl.length !== 0; i++) {
+                                    await new Promise((resolve) =>
+                                      setTimeout(resolve, 100)
+                                    );
+                                  }
                                   sendToObsidian();
                                   openFileInObsidian(compiledUrl);
                                 }}
