@@ -46,7 +46,7 @@ import {
   compileTemplateCallback,
   compileTemplateCallbackController,
 } from "./utils";
-import { getUrlMentions, obsidianRequest } from "./utils/requests";
+import { getUrlMentions, obsidianRequest, openFileInObsidian } from "./utils/requests";
 import RequestParameters from "./components/RequestParameters";
 import {
   CurrentMaxOnboardingVersion,
@@ -466,7 +466,7 @@ if (!document.getElementById(ROOT_CONTAINER_ID)) {
         }
         previewContext.page.content =
           readabilityDataToMarkdown(pageReadability);
-      } catch (e) {}
+      } catch (e) { }
 
       setPreviewContext(previewContext);
     }
@@ -739,36 +739,36 @@ if (!document.getElementById(ROOT_CONTAINER_ID)) {
                         <>
                           {(mentions.length > 0 ||
                             directReferences.length > 0) && (
-                            <div className="mentions">
-                              {directReferences.map((ref) => (
-                                <MentionNotice
-                                  key={ref.filename}
-                                  type="direct"
-                                  templateSuggestion={searchMatchDirectTemplate}
-                                  mention={ref}
-                                  acceptSuggestion={acceptSuggestion}
-                                />
-                              ))}
-                              {mentions
-                                .filter(
-                                  (ref) =>
-                                    !directReferences.find(
-                                      (d) => d.filename === ref.filename
-                                    )
-                                )
-                                .map((ref) => (
+                              <div className="mentions">
+                                {directReferences.map((ref) => (
                                   <MentionNotice
                                     key={ref.filename}
-                                    type="mention"
-                                    templateSuggestion={
-                                      searchMatchMentionTemplate
-                                    }
+                                    type="direct"
+                                    templateSuggestion={searchMatchDirectTemplate}
                                     mention={ref}
                                     acceptSuggestion={acceptSuggestion}
                                   />
                                 ))}
-                            </div>
-                          )}
+                                {mentions
+                                  .filter(
+                                    (ref) =>
+                                      !directReferences.find(
+                                        (d) => d.filename === ref.filename
+                                      )
+                                  )
+                                  .map((ref) => (
+                                    <MentionNotice
+                                      key={ref.filename}
+                                      type="mention"
+                                      templateSuggestion={
+                                        searchMatchMentionTemplate
+                                      }
+                                      mention={ref}
+                                      acceptSuggestion={acceptSuggestion}
+                                    />
+                                  ))}
+                              </div>
+                            )}
                         </>
                       )}
                       {popupFormDisplayed && (
@@ -805,7 +805,15 @@ if (!document.getElementById(ROOT_CONTAINER_ID)) {
                                 color="primary"
                                 size="large"
                                 disabled={!contentIsValid}
-                                onClick={sendToObsidian}
+                                onClick={async () => {
+                                  for (let i: number = 0; i < 30 && compiledUrl.length !== 0; i++) {
+                                    await new Promise((resolve) =>
+                                      setTimeout(resolve, 100)
+                                    );
+                                  }
+                                  sendToObsidian();
+                                  openFileInObsidian(compiledUrl);
+                                }}
                                 title="Send to Obsidian"
                               >
                                 <SendIcon className="send-to-obsidian-icon" />
